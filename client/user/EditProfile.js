@@ -6,6 +6,8 @@ import Button from "@material-ui/core/Button";
 import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
 import Icon from "@material-ui/core/Icon";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
+import Switch from "@material-ui/core/Switch";
 import { makeStyles } from "@material-ui/core/styles";
 import auth from "./../auth/auth-helper";
 import { read, update } from "./api-user.js";
@@ -46,6 +48,7 @@ export default function EditProfile({ match }) {
     open: false,
     error: "",
     redirectToProfile: false,
+    educator: false,
   });
   const jwt = auth.isAuthenticated();
 
@@ -63,7 +66,12 @@ export default function EditProfile({ match }) {
       if (data && data.error) {
         setValues({ ...values, error: data.error });
       } else {
-        setValues({ ...values, name: data.name, email: data.email });
+        setValues({
+          ...values,
+          name: data.name,
+          email: data.email,
+          educator: data.educator,
+        });
       }
     });
     return function cleanup() {
@@ -76,6 +84,7 @@ export default function EditProfile({ match }) {
       name: values.name || undefined,
       email: values.email || undefined,
       password: values.password || undefined,
+      educator: values.educator,
     };
     update(
       {
@@ -89,12 +98,19 @@ export default function EditProfile({ match }) {
       if (data && data.error) {
         setValues({ ...values, error: data.error });
       } else {
-        setValues({ ...values, userId: data._id, redirectToProfile: true });
+        auth.updateUser(data, () => {
+          setValues({ ...values, userId: data._id, redirectToProfile: true });
+        });
       }
     });
   };
-  const handleChange = (name) => (event) => {
+
+  const handleChange = (name) => (event, arg1, arg2, arg3) => {
     setValues({ ...values, [name]: event.target.value });
+  };
+
+  const handleCheck = (event) => {
+    setValues({ ...values, educator: event.target.checked });
   };
 
   if (values.redirectToProfile) {
@@ -136,9 +152,21 @@ export default function EditProfile({ match }) {
         />
         <br />
         <Typography variant="subtitle1" className={classes.subheading}>
-          I am a educator
+          I am a Educator
         </Typography>
-
+        <FormControlLabel
+          control={
+            <Switch
+              classes={{
+                checked: classes.checked,
+                bar: classes.bar,
+              }}
+              checked={values.educator}
+              onChange={handleCheck}
+            />
+          }
+          label={values.educator ? "yes" : "no"}
+        />
         <br />
         {values.error && (
           <Typography component="p" color="error">
