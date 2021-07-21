@@ -53,11 +53,22 @@ const signout = (req, res) => {
   });
 };
 
+/**
+ * Append token info to "auth" property of req
+ */
 const requireSignin = expressJwt({
   secret: config.jwtSecret,
   userProperty: "auth",
 });
 
+/**
+ *
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ * @returns
+ * Determine if the current page's user is the same user logged in
+ */
 const hasAuthorization = (req, res, next) => {
   const authorized = req.profile && req.auth && req.profile._id == req.auth._id;
   if (!authorized) {

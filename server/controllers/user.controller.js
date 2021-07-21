@@ -82,6 +82,24 @@ const remove = async (req, res) => {
   }
 };
 
+/**
+ *
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ * @returns
+ * Determine if the user is a educator
+ */
+const isEducator = (req, res, next) => {
+  const isEducator = req.profile && req.profile.educator;
+  if (!isEducator) {
+    return res.status("403").json({
+      error: "User is not an educator",
+    });
+  }
+  next();
+};
+
 export default {
   create,
   userByID,
@@ -89,4 +107,5 @@ export default {
   list,
   remove,
   update,
+  isEducator,
 };
