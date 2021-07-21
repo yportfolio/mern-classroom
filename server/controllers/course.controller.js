@@ -35,6 +35,25 @@ const create = (req, res) => {
   });
 };
 
+/**
+ *
+ * @param {*} req
+ * @param {*} res
+ * Send back all courses that have a instructor id which match the user's id
+ */
+const listByInstructor = (req, res) => {
+  Course.find({ instructor: req.profile._id }, (error, courses) => {
+    if (error) {
+      return res.status(400).json({
+        error: errorHandler.getErrorMessage(error),
+      });
+    } else {
+      res.json(courses);
+    }
+  });
+};
+
 export default {
   create,
+  listByInstructor,
 };

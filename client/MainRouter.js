@@ -9,6 +9,7 @@ import Profile from "./user/Profile";
 import PrivateRoute from "./auth/PrivateRoute";
 import Menu from "./core/Menu";
 import NewCourse from "./course/NewCourse";
+import MyCourses from "./course/MyCourses";
 
 const MainRouter = () => {
   return (
@@ -23,6 +24,7 @@ const MainRouter = () => {
         <Route path="/user/:userId" component={Profile} />
 
         <PrivateRoute path="/teach/course/new" component={NewCourse} />
+        <PrivateRoute path="/teach/courses" component={MyCourses} />
       </Switch>
     </div>
   );
