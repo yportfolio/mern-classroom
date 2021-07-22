@@ -79,9 +79,9 @@ const MyCourses = () => {
       <Paper className={classes.root} elevation={4}>
         <Typography type="title" className={classes.title}>
           Your courses
-          <span>
+          <span className={classes.addButton}>
             <Link to="/teach/course/new">
-              <Button>
+              <Button color="primary" variant="contained">
                 <Icon>add_box</Icon>
                 New Course
               </Button>
