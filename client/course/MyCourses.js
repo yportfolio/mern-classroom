@@ -80,7 +80,7 @@ const MyCourses = () => {
         <Typography type="title" className={classes.title}>
           Your courses
           <span>
-            <Link>
+            <Link to="/teach/course/new">
               <Button>
                 <Icon>add_box</Icon>
                 New Course

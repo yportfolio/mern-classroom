@@ -39,6 +39,29 @@ const create = (req, res) => {
  *
  * @param {*} req
  * @param {*} res
+ * @param {*} next
+ * @param {*} id
+ * @returns
+ * Load the course by course id and append it to req
+ */
+const courseById = async (req, res, next, id) => {
+  try {
+    let course = await Course.findById(id).populate("instructor", "_id name");
+    if (!course) {
+      return res.status("400").json({ error: "Course not found." });
+    } else {
+      req.course = course;
+    }
+    next();
+  } catch (error) {
+    return res.status("400").json({ error: "Could not retrieve course" });
+  }
+};
+
+/**
+ *
+ * @param {*} req
+ * @param {*} res
  * Send back all courses that have a instructor id which match the user's id
  */
 const listByInstructor = (req, res) => {
@@ -53,7 +76,23 @@ const listByInstructor = (req, res) => {
   });
 };
 
+const photo = (req, res, next) => {
+  if (req.course.image.data) {
+    res.set("Content-Type", req.course.image.contentType);
+    return res.send(req.course.image.data);
+  } else {
+    next();
+  }
+};
+
+const defaultPhoto = (req, res) => {
+  return res.sendFile(process.cwd() + defaultImage);
+};
+
 export default {
   create,
   listByInstructor,
+  courseById,
+  photo,
+  defaultPhoto,
 };
