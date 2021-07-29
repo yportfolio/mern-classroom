@@ -89,10 +89,97 @@ const defaultPhoto = (req, res) => {
   return res.sendFile(process.cwd() + defaultImage);
 };
 
+/**
+ *
+ * @param {*} req
+ * @param {*} res
+ * @returns updated course info
+ * Remove course image in order to saving data
+ * Image will be retrieved from photo or defaultPhoto api
+ */
+const read = (req, res) => {
+  req.course.image = undefined;
+  return res.json(req.course);
+};
+
+const update = async (req, res) => {
+  let form = new formidable.IncomingForm();
+  form.keepExtensions = true;
+  form.parse(req, async (err, fields, files) => {
+    if (err) {
+      return res.status(400).json({
+        error: "Photo could not be uploaded",
+      });
+    }
+
+    let course = req.course;
+    course = extend(course, fields);
+    if (fields.lessons) {
+      course.lessons = JSON.parse(fields.lessons);
+    }
+    course.updated = Date.now();
+    if (files.image) {
+      course.image.data = fs.readFileSync(files.image.path);
+      course.image.contentType = files.image.type;
+    }
+
+    try {
+      await course.save();
+      res.json(course);
+    } catch (error) {
+      return res.status(400).json({
+        error: errorHandler.getErrorMessage(error),
+      });
+    }
+  });
+};
+
+/**
+ *
+ * @param {*} req
+ * @param {*} res
+ * @returns Create a new lesson
+ */
+const newLesson = async (req, res) => {
+  try {
+    let lesson = req.body.lesson;
+    let result = await Course.findByIdAndUpdate(
+      req.course._id,
+      {
+        $push: { lessons: lesson },
+        updated: Date.now(),
+      },
+      { new: true }
+    )
+      .populate("instructor", "_id name")
+      .exec();
+    res.json(result);
+  } catch (error) {
+    return res.status(400).json({
+      error: errorHandler.getErrorMessage(error),
+    });
+  }
+};
+
+const isInstructor = (req, res, next) => {
+  const isInstructor =
+    req.course && req.auth && req.course.instructor._id == req.auth._id;
+  if (!isInstructor) {
+    return res.status("403").json({
+      error: "User is not authorized",
+    });
+  }
+  next();
+};
+
 export default {
   create,
   listByInstructor,
   courseById,
   photo,
   defaultPhoto,
+  read,
+  update,
+  isInstructor,
+  newLesson,
 };
