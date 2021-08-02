@@ -8,7 +8,7 @@ const router = express.Router();
 /**
  * 获取对应user id 注册的所有courses
  */
-// router.route("/api/courses/published").get(courseCtrl.listPublished);
+router.route("/api/courses/published").get(courseCtrl.listPublished);
 
 router
   .route("/api/courses/by/:userId")

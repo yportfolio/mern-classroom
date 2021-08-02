@@ -99,4 +99,28 @@ const remove = async (params, credentials) => {
   }
 };
 
-export { create, listByInstructor, read, update, newLesson, remove };
+const listPublished = async (signal) => {
+  try {
+    let response = await fetch("/api/courses/published", {
+      method: "GET",
+      signal: signal,
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    });
+    return await response.json();
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export {
+  create,
+  listByInstructor,
+  read,
+  update,
+  newLesson,
+  remove,
+  listPublished,
+};

@@ -184,6 +184,18 @@ const remove = async (req, res) => {
   }
 };
 
+const listPublished = async (req, res) => {
+  Course.find({ published: true }, (error, courses) => {
+    if (error) {
+      return res.status(400).json({
+        error: errorHandler.getErrorMessage(error),
+      });
+    } else {
+      res.json(courses);
+    }
+  }).populate("instructor", "_id name");
+};
+
 export default {
   create,
   listByInstructor,
@@ -195,4 +207,5 @@ export default {
   isInstructor,
   newLesson,
   remove,
+  listPublished,
 };
