@@ -33,7 +33,8 @@ router.route("/api/courses/defaultphoto").get(courseCtrl.defaultPhoto);
 router
   .route("/api/courses/:courseId")
   .get(courseCtrl.read)
-  .put(authCtrl.requireSignin, courseCtrl.isInstructor, courseCtrl.update);
+  .put(authCtrl.requireSignin, courseCtrl.isInstructor, courseCtrl.update)
+  .delete(authCtrl.requireSignin, courseCtrl.isInstructor, courseCtrl.remove);
 
 router
   .route("/api/courses/:courseId/lesson/new")

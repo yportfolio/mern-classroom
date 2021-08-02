@@ -83,4 +83,20 @@ const newLesson = async (params, credentials, lesson) => {
   }
 };
 
-export { create, listByInstructor, read, update, newLesson };
+const remove = async (params, credentials) => {
+  try {
+    let response = await fetch("/api/courses/" + params.courseId, {
+      method: "DELETE",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + credentials.t,
+      },
+    });
+    return await response.json();
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export { create, listByInstructor, read, update, newLesson, remove };

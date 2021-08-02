@@ -18,7 +18,7 @@ import { read, update } from "./api-course.js";
 // import { enrollmentStats } from "./../enrollment/api-enrollment";
 import { Link, Redirect } from "react-router-dom";
 import auth from "./../auth/auth-helper";
-// import DeleteCourse from "./DeleteCourse";
+import DeleteCourse from "./DeleteCourse";
 import Divider from "@material-ui/core/Divider";
 import NewLesson from "./NewLesson";
 import Dialog from "@material-ui/core/Dialog";
@@ -147,7 +147,9 @@ const Course = ({ match }) => {
     });
   };
 
-  const removeCourse = () => {};
+  const removeCourse = (course) => {
+    setValues({ ...values, redirect: true });
+  };
 
   const handleClose = () => {
     setOpen(false);
@@ -203,7 +205,7 @@ const Course = ({ match }) => {
                             ? "Add at least 1 lesson to publish"
                             : "Publish"}
                         </Button>
-                        {/* <DeleteCourse course={course} onRemove={removeCourse} /> */}
+                        <DeleteCourse course={course} onRemove={removeCourse} />
                       </>
                     ) : (
                       <>

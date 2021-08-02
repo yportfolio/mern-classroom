@@ -172,6 +172,18 @@ const isInstructor = (req, res, next) => {
   next();
 };
 
+const remove = async (req, res) => {
+  try {
+    let course = req.course;
+    let deleteCourse = await course.remove();
+    res.json(deleteCourse);
+  } catch (error) {
+    return res.status(400).json({
+      error: errorHandler.getErrorMessage(error),
+    });
+  }
+};
+
 export default {
   create,
   listByInstructor,
@@ -182,4 +194,5 @@ export default {
   update,
   isInstructor,
   newLesson,
+  remove,
 };
