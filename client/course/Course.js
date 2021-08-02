@@ -128,7 +128,8 @@ const Course = ({ match }) => {
     }
   };
 
-  //TODO why there is no new course data
+  //Why there is no new course data
+  //It's in edit course data
   const publish = () => {
     let courseData = new FormData();
     courseData.append("published", true);
