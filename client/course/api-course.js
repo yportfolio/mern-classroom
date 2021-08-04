@@ -8,7 +8,7 @@ const create = async (params, credentials, course) => {
       },
       body: course,
     });
-    return response.json();
+    return await response.json();
   } catch (err) {
     console.log(err);
   }

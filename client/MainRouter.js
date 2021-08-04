@@ -12,6 +12,7 @@ import NewCourse from "./course/NewCourse";
 import MyCourses from "./course/MyCourses";
 import Course from "./course/Course";
 import EditCourse from "./course/EditCourse";
+import Enrollment from "./enrollment/Enrollment";
 
 /**
  * Sequence matters.
@@ -37,6 +38,7 @@ const MainRouter = () => {
           component={EditCourse}
         />
         <PrivateRoute path="/teach/course/:courseId" component={Course} />
+        <PrivateRoute path="/learn/:enrollmentId" component={Enrollment} />
       </Switch>
     </div>
   );
