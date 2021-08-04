@@ -118,9 +118,8 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Enrollment = ({ match }) => {
+export default function Enrollment({ match }) {
   const classes = useStyles();
-  const jwt = auth.isAuthenticated();
 
   const [enrollment, setEnrollment] = useState({
     course: { instructor: [] },
@@ -133,6 +132,8 @@ const Enrollment = ({ match }) => {
   });
 
   const [totalComplete, setTotalComplete] = useState(0);
+
+  const jwt = auth.isAuthenticated();
 
   useEffect(() => {
     const abortController = new AbortController();
@@ -150,21 +151,15 @@ const Enrollment = ({ match }) => {
         setEnrollment(data);
       }
     });
-    return () => {
+    return function cleanup() {
       abortController.abort();
     };
   }, [match.params.enrollmentId]);
 
-  /**
-   *
-   * @param {*} lessons a array of lessonStatus object in the enrolled course
-   * @returns the number of completed lessons
-   */
   const totalCompleted = (lessons) => {
     let count = lessons.reduce((total, lessonStatus) => {
-      return total + (lessonStatus.complet ? 1 : 0);
-    });
-
+      return total + (lessonStatus.complete ? 1 : 0);
+    }, 0);
     setTotalComplete(count);
     return count;
   };
@@ -173,7 +168,40 @@ const Enrollment = ({ match }) => {
     setValues({ ...values, drawer: index });
   };
 
-  const markComplete = () => {};
+  const markComplete = () => {
+    if (!enrollment.lessonStatus[values.drawer].complete) {
+      //compute the updated completed courses
+      const lessonStatus = enrollment.lessonStatus;
+      lessonStatus[values.drawer].complete = true;
+      let count = totalCompleted(lessonStatus);
+
+      //The update data needed pass to the server
+      let updatedData = {};
+      updatedData.lessonStatusId = lessonStatus[values.drawer]._id;
+      updatedData.complete = true;
+
+      // If all lessons are completed, the course will be marked as completed
+      if (count == lessonStatus.length) {
+        updatedData.courseCompleted = Date.now();
+      }
+
+      complete(
+        {
+          enrollmentId: match.params.enrollmentId,
+        },
+        {
+          t: jwt.token,
+        },
+        updatedData
+      ).then((data) => {
+        if (data && data.error) {
+          setValues({ ...values, error: data.error });
+        } else {
+          setEnrollment({ ...enrollment, lessonStatus: lessonStatus });
+        }
+      });
+    }
+  };
 
   const imageUrl = enrollment.course._id
     ? `/api/courses/photo/${enrollment.course._id}?${new Date().getTime()}`
@@ -184,7 +212,9 @@ const Enrollment = ({ match }) => {
       <Drawer
         className={classes.drawer}
         variant="permanent"
-        classes={{ paper: classes.drawerPaper }}
+        classes={{
+          paper: classes.drawerPaper,
+        }}
       >
         <div className={classes.toolbar} />
         <List>
@@ -192,7 +222,7 @@ const Enrollment = ({ match }) => {
             button
             onClick={selectDrawer(-1)}
             className={
-              values.drawer === -1 ? classes.selectedDrawer : classes.unselected
+              values.drawer == -1 ? classes.selectedDrawer : classes.unselected
             }
           >
             <ListItemIcon>
@@ -201,20 +231,19 @@ const Enrollment = ({ match }) => {
             <ListItemText primary={"Course Overview"} />
           </ListItem>
         </List>
-
         <Divider />
 
         <List className={classes.unselected}>
           <ListSubheader component="div" className={classes.subhead}>
             Lessons
           </ListSubheader>
-          {enrollment.lessonStatus.map((lesson, index) => {
+          {enrollment.lessonStatus.map((lesson, index) => (
             <ListItem
               button
               key={index}
               onClick={selectDrawer(index)}
               className={
-                values.drawer === index
+                values.drawer == index
                   ? classes.selectedDrawer
                   : classes.unselected
               }
@@ -225,23 +254,21 @@ const Enrollment = ({ match }) => {
               <ListItemText primary={enrollment.course.lessons[index].title} />
               <ListItemSecondaryAction>
                 {lesson.complete ? (
-                  <CheckCircle className={classes.ckeck} />
+                  <CheckCircle className={classes.check} />
                 ) : (
                   <RadioButtonUncheckedIcon />
                 )}
               </ListItemSecondaryAction>
-            </ListItem>;
-          })}
+            </ListItem>
+          ))}
         </List>
-
         <Divider />
-
         <List>
           <ListItem>
             <ListItemText
               primary={
                 <div className={classes.progress}>
-                  <span>{totalComplete} </span> out of
+                  <span>{totalComplete}</span> out of{" "}
                   <span>{enrollment.lessonStatus.length}</span> completed
                 </div>
               }
@@ -384,6 +411,4 @@ const Enrollment = ({ match }) => {
       )}
     </div>
   );
-};
-
-export default Enrollment;
+}

@@ -48,4 +48,24 @@ const listEnrolled = async (credentials, signal) => {
   }
 };
 
-export { create, read, listEnrolled };
+const complete = async (params, credentials, enrollment) => {
+  try {
+    let response = await fetch(
+      "/api/enrollment/complete/" + params.enrollmentId,
+      {
+        method: "PUT",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + credentials.t,
+        },
+        body: JSON.stringify(enrollment),
+      }
+    );
+    return await response.json();
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+export { create, read, listEnrolled, complete };

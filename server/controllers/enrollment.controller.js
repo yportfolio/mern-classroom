@@ -117,6 +117,31 @@ const listEnrolled = async (req, res) => {
   }
 };
 
+const complete = async (req, res) => {
+  let updatedData = {};
+  //lesson status
+  //TODO what is the dollar sign means?
+  updatedData["lessonStatus.$.complete"] = req.body.complete;
+  updatedData.updated = Date.now();
+
+  //course complete date
+  if (req.body.courseCompleted) {
+    updatedData.completed = req.body.courseCompleted;
+  }
+
+  try {
+    let enrollment = await Enrollment.updateOne(
+      { "lessonStatus._id": req.body.lessonStatusId },
+      { $set: updatedData }
+    );
+    res.json(enrollment);
+  } catch (error) {
+    return res.status(400).json({
+      error: errorHandler.getErrorMessage(error),
+    });
+  }
+};
+
 export default {
   create,
   findEnrollment,
@@ -124,4 +149,5 @@ export default {
   read,
   isStudent,
   listEnrolled,
+  complete,
 };

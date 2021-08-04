@@ -3,11 +3,10 @@ import { makeStyles } from "@material-ui/core/styles";
 import Card from "@material-ui/core/Card";
 import Divider from "@material-ui/core/Divider";
 import { listPublished } from "./../course/api-course";
-import { listEnrolled } from "./../enrollment/api-enrollment";
+import { listEnrolled, listCompleted } from "./../enrollment/api-enrollment";
 import Typography from "@material-ui/core/Typography";
 import auth from "./../auth/auth-helper";
 import Courses from "./../course/Courses";
-import Enrollment from "../enrollment/Enrollment";
 import Enrollments from "../enrollment/Enrollments";
 
 const useStyles = makeStyles((theme) => ({
@@ -73,7 +72,6 @@ export default function Home() {
   const [courses, setCourses] = useState([]);
   const [enrolled, setEnrolled] = useState([]);
 
-  //TODO enrollment feat
   useEffect(() => {
     const abortController = new AbortController();
     const signal = abortController.signal;
@@ -94,7 +92,6 @@ export default function Home() {
   useEffect(() => {
     const abortController = new AbortController();
     const signal = abortController.signal;
-
     listPublished(signal).then((data) => {
       if (data.error) {
         console.log(data.error);
@@ -102,7 +99,6 @@ export default function Home() {
         setCourses(data);
       }
     });
-
     return () => {
       abortController.abort();
     };
@@ -115,13 +111,13 @@ export default function Home() {
           <Typography
             variant="h6"
             component="h2"
-            className={classes.enrolledCard}
+            className={classes.enrolledTitle}
           >
             Courses you are enrolled in
           </Typography>
 
-          {enrolled !== 0 ? (
-            <Enrollments enrollment={enrolled} />
+          {enrolled.length !== 0 ? (
+            <Enrollments enrollments={enrolled} />
           ) : (
             <Typography variant="body1" className={classes.noTitle}>
               No courses.
